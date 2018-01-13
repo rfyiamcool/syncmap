@@ -272,7 +272,7 @@ func (e *entry) tryLoadOrStore(i interface{}) (actual interface{}, loaded, ok bo
 }
 
 // Delete deletes the value for a key.
-func (m *Map) Delete(key interface{}) {
+func (m *Map) Delete(key interface{}) (res bool) {
 	read, _ := m.read.Load().(readOnly)
 	e, ok := read.m[key]
 	if !ok && read.amended {
@@ -282,13 +282,16 @@ func (m *Map) Delete(key interface{}) {
 		if !ok && read.amended {
 			delete(m.dirty, key)
 			atomic.AddInt64(m.counter, -1)
+			res = true
 		}
 		m.mu.Unlock()
 	}
 	if ok {
 		e.delete()
+		res = true
 		atomic.AddInt64(m.counter, -1)
 	}
+	return res
 }
 
 func (m *Map) Length() *int64 {
