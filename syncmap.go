@@ -132,17 +132,17 @@ func (e *entry) load() (value interface{}, ok bool) {
 
 // Store sets the value for a key.
 func (m *Map) Store(key, value interface{}) {
-	if m.counter == nil {
-		v := new(int64)
-		*v = 0
-		m.counter = v
-	}
 	read, _ := m.read.Load().(readOnly)
 	if e, ok := read.m[key]; ok && e.tryStore(&value) {
 		return
 	}
 
 	m.mu.Lock()
+	if m.counter == nil {
+		v := new(int64)
+		*v = 0
+		m.counter = v
+	}
 	read, _ = m.read.Load().(readOnly)
 	if e, ok := read.m[key]; ok {
 		if e.unexpungeLocked() {
