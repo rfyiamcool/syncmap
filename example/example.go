@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/rfyiamcool/syncmap"
 )
@@ -19,7 +20,11 @@ func main() {
 	}
 
 	go func() {
-		m.Delete("c")
+		deleteOk := m.Delete("c")
+		fmt.Println("delete ok ? ", deleteOk)
+
+		deleteOk = m.Delete("d")
+		fmt.Println("delete ok ? ", deleteOk)
 		m.Store("d", "ddd")
 	}()
 
@@ -34,4 +39,6 @@ func main() {
 	})
 
 	fmt.Println("length: ", *m.Length())
+
+	time.Sleep(1 * time.Second)
 }
